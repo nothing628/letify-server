@@ -1,0 +1,16 @@
+version: "3.5"
+services:
+  testing_postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=letify
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=letify
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - pgsqldata:/var/lib/postgresql/data
+    ports:
+      - 5008:5432
+
+volumes:
+  pgsqldata:
