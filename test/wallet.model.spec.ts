@@ -8,5 +8,8 @@ test.group('Wallet Models', () => {
     await wallet.save()
 
     assert.isNotEmpty(wallet.id)
+    assert.equal(wallet.label, 'My Label')
+    assert.isNotEmpty(wallet.createdAt)
+    assert.isNotEmpty(wallet.updatedAt)
   })
 })

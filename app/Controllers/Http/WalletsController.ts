@@ -1,4 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import WalletCreateSchema from 'App/Validators/WalletCreateSchemaValidator'
+import WalletUpdateSchema from 'App/Validators/WalletUpdateSchemaValidator'
 
 export default class WalletsController {
   async index(ctx: HttpContextContract) {
@@ -7,32 +9,34 @@ export default class WalletsController {
     }
   }
 
-  async create(ctx: HttpContextContract) {
+  async store({ request }: HttpContextContract) {
+    const createData = await request.validate(WalletCreateSchema)
+
     return {
       success: true,
     }
   }
-  async store(ctx: HttpContextContract) {
+
+  async show({ params }: HttpContextContract) {
+    const idWallet = params['id']
+
     return {
       success: true,
     }
   }
-  async show(ctx: HttpContextContract) {
+
+  async update({ request, params }: HttpContextContract) {
+    const idWallet = params['id']
+    const updateData = await request.validate(WalletUpdateSchema)
+
     return {
       success: true,
     }
   }
-  async edit(ctx: HttpContextContract) {
-    return {
-      success: true,
-    }
-  }
-  async update(ctx: HttpContextContract) {
-    return {
-      success: true,
-    }
-  }
-  async destroy(ctx: HttpContextContract) {
+
+  async destroy({ params }: HttpContextContract) {
+    const idWallet = params['id']
+
     return {
       success: true,
     }
