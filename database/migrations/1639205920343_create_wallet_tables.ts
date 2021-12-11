@@ -5,7 +5,7 @@ export default class CreateWalletTables extends BaseSchema {
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').notNullable()
+      table.uuid('id').notNullable().primary()
       table.string('label', 50).notNullable();
 
       /**
