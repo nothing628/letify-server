@@ -4,9 +4,12 @@ import WalletCreateSchema from 'App/Validators/WalletCreateSchemaValidator'
 import WalletUpdateSchema from 'App/Validators/WalletUpdateSchemaValidator'
 
 export default class WalletsController {
-  async index(ctx: HttpContextContract) {
+  async index() {
+    const wallets = await Wallet.all()
+
     return {
       success: true,
+      data: wallets,
     }
   }
 
