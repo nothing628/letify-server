@@ -43,7 +43,21 @@ test.group('Test /wallets End-Point', () => {
   test(`ensure GET /wallets/${fakeId} can show wallet`, async (assert) => {
     const response = await supertest(BASE_URL).get(`/${fakeId}`).expect(200)
     const { body } = response
-    const wallet = await Wallet.find(fakeId);
+    const wallet = await Wallet.find(fakeId)
+
+    assert.hasAllKeys(body, ['success', 'data'])
+    assert.isTrue(body.success)
+    assert.deepEqual(body.data, wallet?.toJSON())
+  })
+
+  test(`ensure PATCH /wallets/${fakeId} can update wallet`, async (assert) => {
+    const newFakeLabel = name.firstName()
+    const response = await supertest(BASE_URL)
+      .patch(`/${fakeId}`)
+      .send({ label: newFakeLabel })
+      .expect(200)
+    const { body } = response
+    const wallet = await Wallet.findBy('label', newFakeLabel)
 
     assert.hasAllKeys(body, ['success', 'data'])
     assert.isTrue(body.success)

@@ -41,9 +41,14 @@ export default class WalletsController {
   async update({ request, params }: HttpContextContract) {
     const idWallet = params['id']
     const updateData = await request.validate(WalletUpdateSchema)
+    const wallet = await Wallet.findOrFail(idWallet)
+    wallet.label = updateData.label
+
+    await wallet.save()
 
     return {
       success: true,
+      data: wallet,
     }
   }
 
