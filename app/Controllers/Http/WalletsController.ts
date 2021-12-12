@@ -30,9 +30,11 @@ export default class WalletsController {
 
   async show({ params }: HttpContextContract) {
     const idWallet = params['id']
+    const wallet = await Wallet.find(idWallet)
 
     return {
       success: true,
+      data: wallet,
     }
   }
 
