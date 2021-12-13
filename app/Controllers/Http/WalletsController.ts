@@ -52,11 +52,12 @@ export default class WalletsController {
     }
   }
 
-  async destroy({ params }: HttpContextContract) {
+  async destroy({ params, response }: HttpContextContract) {
     const idWallet = params['id']
+    const wallet = await Wallet.findOrFail(idWallet)
 
-    return {
-      success: true,
-    }
+    await wallet.delete()
+
+    response.status(204)
   }
 }

@@ -7,6 +7,7 @@ const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/wallets`
 
 test.group('Test /wallets End-Point', () => {
   const fakeLabel = name.firstName()
+  const newFakeLabel = name.firstName()
   let fakeId = ''
 
   test('ensure POST /wallets can store to database', async (assert) => {
@@ -51,7 +52,6 @@ test.group('Test /wallets End-Point', () => {
   })
 
   test(`ensure PATCH /wallets/${fakeId} can update wallet`, async (assert) => {
-    const newFakeLabel = name.firstName()
     const response = await supertest(BASE_URL)
       .patch(`/${fakeId}`)
       .send({ label: newFakeLabel })
@@ -62,5 +62,13 @@ test.group('Test /wallets End-Point', () => {
     assert.hasAllKeys(body, ['success', 'data'])
     assert.isTrue(body.success)
     assert.deepEqual(body.data, wallet?.toJSON())
+  })
+
+  test(`ensure DELETE /wallets/${fakeId} can delete wallet`, async (assert) => {
+    await supertest(BASE_URL).delete(`/${fakeId}`).expect(204)
+
+    const wallet = await Wallet.findBy('label', newFakeLabel)
+
+    assert.isNull(wallet, 'Wallet should deleted from database')
   })
 })
