@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import Wallet from './Wallet'
 
 export default class Transaction extends BaseModel {
   public static table = 'transactions'
@@ -24,4 +25,7 @@ export default class Transaction extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @belongsTo(() => Wallet, { foreignKey: 'wallet_id' })
+  public wallet: BelongsTo<typeof Wallet>
 }

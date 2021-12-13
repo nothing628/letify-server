@@ -16,6 +16,8 @@ export default class CreateTransactionTables extends BaseSchema {
       table.timestamp('transaction_at', { useTz: true })
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
+
+      table.foreign('wallet_id').references('id').inTable('wallets')
     })
 
     this.schema.raw(`alter table ${this.tableName} alter id set default gen_random_uuid()`)
