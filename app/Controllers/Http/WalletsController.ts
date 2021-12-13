@@ -28,36 +28,63 @@ export default class WalletsController {
     }
   }
 
-  async show({ params }: HttpContextContract) {
+  async show({ params, response }: HttpContextContract) {
     const idWallet = params['id']
-    const wallet = await Wallet.find(idWallet)
 
-    return {
-      success: true,
-      data: wallet,
+    try {
+      const wallet = await Wallet.findOrFail(idWallet)
+
+      return {
+        success: true,
+        data: wallet,
+      }
+    } catch {
+      response.status(404)
+      return {
+        success: false,
+        message: 'Wallet not found',
+      }
     }
   }
 
-  async update({ request, params }: HttpContextContract) {
+  async update({ request, response, params }: HttpContextContract) {
     const idWallet = params['id']
     const updateData = await request.validate(WalletUpdateSchema)
-    const wallet = await Wallet.findOrFail(idWallet)
-    wallet.label = updateData.label
 
-    await wallet.save()
+    try {
+      const wallet = await Wallet.findOrFail(idWallet)
+      wallet.label = updateData.label
 
-    return {
-      success: true,
-      data: wallet,
+      await wallet.save()
+
+      return {
+        success: true,
+        data: wallet,
+      }
+    } catch {
+      response.status(404)
+      return {
+        success: false,
+        message: 'Wallet not found',
+      }
     }
   }
 
   async destroy({ params, response }: HttpContextContract) {
     const idWallet = params['id']
-    const wallet = await Wallet.findOrFail(idWallet)
 
-    await wallet.delete()
+    try {
+      const wallet = await Wallet.findOrFail(idWallet)
 
-    response.status(204)
+      await wallet.delete()
+
+      response.status(204)
+    } catch {
+      response.status(404)
+      return {
+        success: false,
+        message: 'Wallet not found',
+      }
+    }
   }
 }
