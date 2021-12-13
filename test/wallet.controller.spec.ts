@@ -93,7 +93,7 @@ test.group('Test /wallets End-Point', () => {
     assert.equal(body.message, 'Wallet not found')
   })
 
-  test(`ensure DELETE /wallets/:id throw 404 (not exists data)`, async (assert) => {
+  test(`ensure DELETE /wallets/:id throw 404 (not exists data)`, async () => {
     await supertest(BASE_URL).delete(`/${fakeId}`).expect(404)
   })
 })
