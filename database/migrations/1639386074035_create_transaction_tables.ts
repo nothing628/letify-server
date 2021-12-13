@@ -8,7 +8,7 @@ export default class CreateTransactionTables extends BaseSchema {
       table.uuid('id').notNullable().primary()
       table.uuid('wallet_id')
       table.decimal('amount')
-      table.string('notes')
+      table.string('notes', 1024)
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
