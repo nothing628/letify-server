@@ -25,3 +25,4 @@ Route.get('/', async () => {
 })
 
 Route.resource('/wallets', 'WalletsController').except(['create', 'edit'])
+Route.resource('/transactions', 'TransactionsController').except(['create', 'edit'])
