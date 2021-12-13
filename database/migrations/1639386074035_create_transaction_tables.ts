@@ -7,7 +7,7 @@ export default class CreateTransactionTables extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').notNullable().primary()
       table.uuid('wallet_id')
-      table.decimal('amount')
+      table.decimal('amount', 50, 2)
       table.string('notes', 1024)
 
       /**
