@@ -1,4 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import TransactionCreateSchemaValidationValidator from 'App/Validators/TransactionCreateSchemaValidationValidator'
+import TransactionUpdateSchemaValidationValidator from 'App/Validators/TransactionUpdateSchemaValidationValidator'
 
 export default class TransactionsController {
   async index() {}
