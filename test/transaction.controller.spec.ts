@@ -4,7 +4,7 @@ import supertest from 'supertest'
 import Transaction from 'App/Models/Transaction'
 import Wallet from 'App/Models/Wallet'
 import moment from 'moment'
-import { get } from 'lodash'
+import get from 'lodash/get'
 import { finance, date } from 'faker'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/transactions`
@@ -103,10 +103,21 @@ test.group('Test /transactions End-Point', (group) => {
     const response = await supertest(BASE_URL).get('/').expect(200)
     const { body } = response
     const transactions = await Transaction.all()
-    const transactions_object = transactions.map(t => t.toJSON())
+    const transactions_object = transactions.map((t) => t.toJSON())
 
     assert.deepNestedPropertyVal(body, 'success', true)
     expect(get(body, 'data')).to.have.length(transactions.length)
     expect(get(body, 'data')).to.have.deep.members(transactions_object)
+  })
+
+  test('ensure GET /transactions can filter list transaction based on wallet id', async () => {
+    const response = await supertest(BASE_URL).get(`/?wallet_id=${walletId}`).expect(200)
+    const { body } = response
+    const transactions = await Transaction.all()
+    const transactions_object = transactions.map((t) => t.toJSON())
+
+    expect(get(body, 'success')).to.be.true
+    expect(get(body, 'data')).to.have.length(transactions_object.length)
+      .that.have.deep.members(transactions_object)
   })
 })
