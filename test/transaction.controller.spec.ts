@@ -153,4 +153,78 @@ test.group('Test /transactions End-Point', (group) => {
     expect(get(body, 'success')).to.be.false
     expect(get(body, 'message')).to.equal('Transaction not found')
   })
+
+  test('ensure PATCH /transactions/:id can update transaction', async () => {
+    const fakeAmount = parseFloat(finance.amount(0, 1000000, 0, ''))
+    const fakeDescription = finance.transactionDescription()
+    const transactionAt = date.past(1)
+    const response = await supertest(BASE_URL)
+      .patch(`/${tempId}`)
+      .send({
+        amount: fakeAmount,
+        notes: fakeDescription,
+        transactionAt: transactionAt,
+      })
+      .expect(200)
+    const { body } = response
+    const transaction = await Transaction.findOrFail(tempId)
+    const transactionObject = transaction.toJSON()
+    transactionObject.amount = parseFloat(transactionObject.amount)
+
+    expect(get(body, 'success')).to.be.true
+    expect(get(body, 'data')).to.be.deep.equal(transactionObject)
+  })
+
+  test('ensure PATCH /transactions/:id throw 404 when update non-exists transaction', async () => {
+    const fakeId = datatype.uuid()
+    const fakeAmount = parseFloat(finance.amount(0, 1000000, 0, ''))
+    const fakeDescription = finance.transactionDescription()
+    const transactionAt = date.past(1)
+    const response = await supertest(BASE_URL)
+      .patch(`/${fakeId}`)
+      .send({
+        amount: fakeAmount,
+        notes: fakeDescription,
+        transactionAt: transactionAt,
+      })
+      .expect(404)
+    const { body } = response
+
+    expect(get(body, 'success')).to.be.false
+    expect(get(body, 'message')).to.equal('Transaction not found')
+  })
+
+  test('ensure PATCH /transactions/:id validate the request', async () => {
+    const fakeAmount = parseFloat(finance.amount(0, 1000000, 0, ''))
+    const fakeDescription = finance.transactionDescription()
+    const transactionAt = date.past(1)
+
+    // Request without amount
+    await supertest(BASE_URL)
+      .patch(`/${tempId}`)
+      .send({
+        notes: fakeDescription,
+        transactionAt: transactionAt,
+      })
+      .expect(422)
+
+    // Request without transaction time
+    await supertest(BASE_URL)
+      .patch(`/${tempId}`)
+      .send({
+        amount: fakeAmount,
+        notes: fakeDescription,
+      })
+      .expect(422)
+
+    // Request with empty notes
+    // this should be treated as valid request
+    await supertest(BASE_URL)
+      .patch(`/${tempId}`)
+      .send({
+        amount: fakeAmount,
+        transactionAt: transactionAt,
+      })
+      .expect(200)
+  })
 })
