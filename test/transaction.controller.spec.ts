@@ -5,7 +5,7 @@ import Transaction from 'App/Models/Transaction'
 import Wallet from 'App/Models/Wallet'
 import moment from 'moment'
 import get from 'lodash/get'
-import { finance, date } from 'faker'
+import { finance, date, datatype } from 'faker'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/transactions`
 
@@ -109,7 +109,7 @@ test.group('Test /transactions End-Point', (group) => {
       .expect(200)
   })
 
-  test('ensure GET /transaction can list all transaction', async () => {
+  test('ensure GET /transactions can list all transaction', async () => {
     const response = await supertest(BASE_URL).get('/').expect(200)
     const { body } = response
     const transactions = await Transaction.all()
@@ -124,7 +124,9 @@ test.group('Test /transactions End-Point', (group) => {
     for (let i = 0; i < wallets.length; i++) {
       const response = await supertest(BASE_URL).get(`/?wallet_id=${wallets[i].id}`).expect(200)
       const { body } = response
-      const transactions = await Transaction.query().withScopes((scope) => scope.withWallet(wallets[i]))
+      const transactions = await Transaction.query().withScopes((scope) =>
+        scope.withWallet(wallets[i])
+      )
       const transactions_object = transactions.map((t) => t.toJSON())
 
       expect(get(body, 'success')).to.be.true
@@ -132,5 +134,23 @@ test.group('Test /transactions End-Point', (group) => {
         .to.have.length(transactions_object.length)
         .that.have.deep.members(transactions_object)
     }
+  })
+
+  test('ensure GET /transactions/:id can get correct transaction', async () => {
+    const response = await supertest(BASE_URL).get(`/${tempId}`).expect(200)
+    const { body } = response
+    const transaction = await Transaction.find(tempId)
+
+    expect(get(body, 'success')).to.be.true
+    expect(get(body, 'data')).to.deep.equal(transaction?.toJSON())
+  })
+
+  test('ensure GET /transactions/:id throw 404 when get non-exists transaction', async () => {
+    const fakeId = datatype.uuid()
+    const response = await supertest(BASE_URL).get(`/${fakeId}`).expect(404)
+    const { body } = response
+
+    expect(get(body, 'success')).to.be.false
+    expect(get(body, 'message')).to.equal('Transaction not found')
   })
 })
