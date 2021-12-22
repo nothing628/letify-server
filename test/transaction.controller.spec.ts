@@ -227,4 +227,21 @@ test.group('Test /transactions End-Point', (group) => {
       })
       .expect(200)
   })
+
+  test('ensure DELETE /transactions/:id', async () => {
+    await supertest(BASE_URL).delete(`/${tempId}`).expect(204)
+
+    const transaction = await Transaction.find(tempId)
+
+    expect(transaction).to.be.null
+  })
+
+  test('ensure DELETE /transactions/:id throw 404 when delete non-exists transactions', async () => {
+    const fakeId = datatype.uuid()
+    const response = await supertest(BASE_URL).delete(`/${fakeId}`).expect(404)
+    const { body } = response
+
+    expect(get(body, 'success')).to.be.false
+    expect(get(body, 'message')).to.equal('Transaction not found')
+  })
 })
