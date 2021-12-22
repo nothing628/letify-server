@@ -4,7 +4,14 @@ import TransactionUpdateSchemaValidator from 'App/Validators/TransactionUpdateSc
 import Transaction from 'App/Models/Transaction'
 
 export default class TransactionsController {
-  async index() {}
+  async index() {
+    const transactions = await Transaction.all()
+
+    return {
+      success: true,
+      data: transactions,
+    }
+  }
 
   async store({ request }: HttpContextContract) {
     const body = await request.validate(TransactionCreateSchemaValidator)

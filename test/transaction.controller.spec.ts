@@ -1,10 +1,11 @@
 import test from 'japa'
+import { assert, expect } from 'chai'
 import supertest from 'supertest'
 import Transaction from 'App/Models/Transaction'
 import Wallet from 'App/Models/Wallet'
 import moment from 'moment'
 import { get } from 'lodash'
-import { name, finance, date } from 'faker'
+import { finance, date } from 'faker'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/transactions`
 
@@ -51,7 +52,7 @@ test.group('Test /transactions End-Point', (group) => {
     tempId = transaction?.id || ''
   })
 
-  test('ensure POST /transactions validate the request', async (assert) => {
+  test('ensure POST /transactions validate the request', async () => {
     const amount = parseFloat(finance.amount(0, 1000000, 0, ''))
     const transactionAt = date.past(1)
 
@@ -96,5 +97,16 @@ test.group('Test /transactions End-Point', (group) => {
         transactionAt: transactionAt.toISOString(),
       })
       .expect(200)
+  })
+
+  test('ensure GET /transaction can list all transaction', async () => {
+    const response = await supertest(BASE_URL).get('/').expect(200)
+    const { body } = response
+    const transactions = await Transaction.all()
+    const transactions_object = transactions.map(t => t.toJSON())
+
+    assert.deepNestedPropertyVal(body, 'success', true)
+    expect(get(body, 'data')).to.have.length(transactions.length)
+    expect(get(body, 'data')).to.have.deep.members(transactions_object)
   })
 })
