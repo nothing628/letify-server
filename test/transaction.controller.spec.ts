@@ -12,14 +12,24 @@ const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/transactions`
 test.group('Test /transactions End-Point', (group) => {
   const fakeNotes = finance.transactionDescription()
   let tempId = ''
-  let walletId = ''
+  let wallets: Wallet[] = []
 
   group.before(async () => {
-    const wallet = new Wallet()
-    wallet.label = finance.accountName()
-    await wallet.save()
+    const currentWallets = await Wallet.all()
 
-    walletId = wallet.id
+    if (currentWallets.length >= 2) {
+      wallets = currentWallets
+      return
+    }
+
+    // Create two wallet
+    for (let i = 0; i < 2; i++) {
+      const wallet = new Wallet()
+      wallet.label = finance.accountName()
+      await wallet.save()
+
+      wallets.push(wallet)
+    }
   })
 
   test('ensure POST /transactions can store transaction to database', async (assert) => {
@@ -28,7 +38,7 @@ test.group('Test /transactions End-Point', (group) => {
     const response = await supertest(BASE_URL)
       .post('/')
       .send({
-        wallet_id: walletId,
+        wallet_id: wallets[0].id,
         amount: amount,
         notes: fakeNotes,
         transactionAt: transactionAt.toISOString(),
@@ -38,7 +48,7 @@ test.group('Test /transactions End-Point', (group) => {
     const { body } = response
 
     assert.deepNestedPropertyVal(body, 'success', true)
-    assert.deepNestedPropertyVal(body, 'data.wallet_id', walletId)
+    assert.deepNestedPropertyVal(body, 'data.wallet_id', wallets[0].id)
     assert.deepNestedPropertyVal(body, 'data.amount', amount)
     assert.deepNestedPropertyVal(body, 'data.notes', fakeNotes)
 
@@ -70,7 +80,7 @@ test.group('Test /transactions End-Point', (group) => {
     await supertest(BASE_URL)
       .post('/')
       .send({
-        wallet_id: walletId,
+        wallet_id: wallets[0].id,
         notes: fakeNotes,
         transactionAt: transactionAt.toISOString(),
       })
@@ -80,7 +90,7 @@ test.group('Test /transactions End-Point', (group) => {
     await supertest(BASE_URL)
       .post('/')
       .send({
-        wallet_id: walletId,
+        wallet_id: wallets[0].id,
         amount: amount,
         notes: fakeNotes,
       })
@@ -91,7 +101,7 @@ test.group('Test /transactions End-Point', (group) => {
     await supertest(BASE_URL)
       .post('/')
       .send({
-        wallet_id: walletId,
+        wallet_id: wallets[0].id,
         amount: amount,
         notes: '',
         transactionAt: transactionAt.toISOString(),
@@ -111,13 +121,16 @@ test.group('Test /transactions End-Point', (group) => {
   })
 
   test('ensure GET /transactions can filter list transaction based on wallet id', async () => {
-    const response = await supertest(BASE_URL).get(`/?wallet_id=${walletId}`).expect(200)
-    const { body } = response
-    const transactions = await Transaction.all()
-    const transactions_object = transactions.map((t) => t.toJSON())
+    for (let i = 0; i < wallets.length; i++) {
+      const response = await supertest(BASE_URL).get(`/?wallet_id=${wallets[i].id}`).expect(200)
+      const { body } = response
+      const transactions = await Transaction.query().withScopes((scope) => scope.withWallet(wallets[i]))
+      const transactions_object = transactions.map((t) => t.toJSON())
 
-    expect(get(body, 'success')).to.be.true
-    expect(get(body, 'data')).to.have.length(transactions_object.length)
-      .that.have.deep.members(transactions_object)
+      expect(get(body, 'success')).to.be.true
+      expect(get(body, 'data'))
+        .to.have.length(transactions_object.length)
+        .that.have.deep.members(transactions_object)
+    }
   })
 })
