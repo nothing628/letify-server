@@ -1,13 +1,13 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import TransactionCreateSchemaValidationValidator from 'App/Validators/TransactionCreateSchemaValidationValidator'
-import TransactionUpdateSchemaValidationValidator from 'App/Validators/TransactionUpdateSchemaValidationValidator'
+import TransactionCreateSchemaValidator from 'App/Validators/TransactionCreateSchemaValidator'
+import TransactionUpdateSchemaValidator from 'App/Validators/TransactionUpdateSchemaValidator'
 import Transaction from 'App/Models/Transaction'
 
 export default class TransactionsController {
   async index() {}
 
   async store({ request }: HttpContextContract) {
-    const body = request.body()
+    const body = await request.validate(TransactionCreateSchemaValidator)
     const transaction = new Transaction()
     transaction.wallet_id = body['wallet_id']
     transaction.transactionAt = body['transactionAt']
