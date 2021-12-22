@@ -6,7 +6,7 @@ export default class TransactionUpdateSchemaValidator {
 
   public schema = schema.create({
     amount: schema.number([rules.required()]),
-    notes: schema.string({ escape: true, trim: true }, [rules.minLength(0), rules.maxLength(1024)]),
+    notes: schema.string.optional({ escape: true, trim: true }, [rules.minLength(0), rules.maxLength(1024)]),
     transactionAt: schema.date({}, [rules.required()]),
   })
 

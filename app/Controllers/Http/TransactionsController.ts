@@ -12,7 +12,7 @@ export default class TransactionsController {
     transaction.wallet_id = body['wallet_id']
     transaction.transactionAt = body['transactionAt']
     transaction.amount = body['amount']
-    transaction.notes = body['notes']
+    transaction.notes = body['notes'] || ''
 
     await transaction.save()
 

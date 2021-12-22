@@ -7,7 +7,7 @@ export default class TransactionCreateSchemaValidator {
   public schema = schema.create({
     wallet_id: schema.string({}, [rules.required(), rules.uuid()]),
     amount: schema.number([rules.required()]),
-    notes: schema.string({ escape: true, trim: true }, [rules.minLength(0), rules.maxLength(1024)]),
+    notes: schema.string.optional({ escape: true, trim: true }, [rules.minLength(0), rules.maxLength(1024)]),
     transactionAt: schema.date({}, [rules.required()]),
   })
 

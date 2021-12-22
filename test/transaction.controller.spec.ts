@@ -69,7 +69,7 @@ test.group('Test /transactions End-Point', (group) => {
     await supertest(BASE_URL)
       .post('/')
       .send({
-        walletId: walletId,
+        wallet_id: walletId,
         notes: fakeNotes,
         transactionAt: transactionAt.toISOString(),
       })
@@ -79,7 +79,7 @@ test.group('Test /transactions End-Point', (group) => {
     await supertest(BASE_URL)
       .post('/')
       .send({
-        walletId: walletId,
+        wallet_id: walletId,
         amount: amount,
         notes: fakeNotes,
       })
@@ -90,7 +90,7 @@ test.group('Test /transactions End-Point', (group) => {
     await supertest(BASE_URL)
       .post('/')
       .send({
-        walletId: walletId,
+        wallet_id: walletId,
         amount: amount,
         notes: '',
         transactionAt: transactionAt.toISOString(),
